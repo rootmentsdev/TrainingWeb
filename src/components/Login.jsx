@@ -104,8 +104,8 @@ const Login = ({ onLoginSuccess }) => {
         <div className="login-container">
             <div className="login-card">
                 <div className="login-header">
-                    <h1>LMS Web Login</h1>
-                    <p>Access your training dashboard</p>
+                    <h1>Welcome Back</h1>
+                    <p>Sign in to access your training dashboard</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="login-form">
@@ -123,7 +123,7 @@ const Login = ({ onLoginSuccess }) => {
                             name="employeeId"
                             value={credentials.employeeId}
                             onChange={handleInputChange}
-                            placeholder="Enter your Employee ID (e.g., EMP103)"
+                            placeholder="Enter your Employee ID"
                             required
                             disabled={loading}
                         />
@@ -144,19 +144,12 @@ const Login = ({ onLoginSuccess }) => {
                     </div>
 
                     <button type="submit" className="login-button" disabled={loading}>
-                        {loading ? 'Logging in...' : 'Login'}
+                        {loading ? 'Signing in...' : 'Sign In'}
                     </button>
                 </form>
 
-                <div className="login-info">
-                    <h3>Login Information</h3>
-                    <p><strong>External API:</strong> <code>POST https://rootments.in/api/verify_employee</code></p>
-                    <p><strong>Backend Proxy:</strong> <code>POST http://localhost:7000/api/verify_employee</code></p>
-                    <p><strong>Test Credentials:</strong></p>
-                    <ul>
-                        <li>Employee ID: <code>EMP103</code></li>
-                        <li>Password: <code>userpassword</code></li>
-                    </ul>
+                <div className="demo-credentials">
+                    <p>Demo Account: <strong>EMP103</strong> / <strong>userpassword</strong></p>
                 </div>
             </div>
         </div>

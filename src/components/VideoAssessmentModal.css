@@ -9,7 +9,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 2000;
     padding: 20px;
 }
 
@@ -17,9 +17,9 @@
     background: white;
     border-radius: 12px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    max-width: 600px;
+    max-width: 500px;
     width: 100%;
-    max-height: 90vh;
+    max-height: 80vh;
     overflow-y: auto;
     position: relative;
 }
@@ -141,7 +141,7 @@
 
 /* Questions Container */
 .questions-container {
-    max-height: 60vh;
+    max-height: 50vh;
     overflow-y: auto;
 }
 
@@ -205,7 +205,9 @@
 /* Assessment Actions */
 .assessment-actions {
     margin-top: 24px;
+    margin-bottom: 16px;
     text-align: center;
+    padding-bottom: 8px;
 }
 
 .submit-assessment-button {
@@ -368,7 +370,8 @@
 @media (max-width: 640px) {
     .video-assessment-modal {
         margin: 10px;
-        max-height: 95vh;
+        max-height: 85vh;
+        max-width: 95vw;
     }
     
     .video-assessment-header {
