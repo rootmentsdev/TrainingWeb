@@ -1216,17 +1216,27 @@ const TrainingDashboard = () => {
           userRole,
         } = response.data;
 
+        // Debug: Log the raw data to see what fields are available
+        console.log('🔍 Raw assigned trainings data:', assignedTrainings);
+        console.log('🔍 Raw mandatory trainings data:', mandatoryTrainings);
+        
+        if (assignedTrainings && assignedTrainings.length > 0) {
+          console.log('🔍 First assigned training fields:', Object.keys(assignedTrainings[0]));
+          console.log('🔍 First assigned training deadline:', assignedTrainings[0].deadline);
+          console.log('🔍 First assigned training dueDate:', assignedTrainings[0].dueDate);
+        }
+
         const transformedAssignedTrainings = assignedTrainings.map((training) => ({
           ...training,
           modules: training.modules || [],
-          dueDate: training.dueDate || '2025-09-29',
+          dueDate: training.deadline || training.dueDate,
         }));
         setUserModules(transformedAssignedTrainings);
 
         const transformedMandatoryTrainings = mandatoryTrainings.map((training) => ({
           ...training,
           modules: training.modules || [],
-          dueDate: training.dueDate || '2025-09-29',
+          dueDate: training.deadline || training.dueDate,
         }));
         setMandatoryTrainings(transformedMandatoryTrainings);
 
@@ -1468,6 +1478,21 @@ const TrainingDashboard = () => {
     if (videoId && videoId.includes('&')) videoId = videoId.split('&')[0];
     if (videoId && videoId.includes('?')) videoId = videoId.split('?')[0];
     return videoId && videoId.length === 11 ? videoId : null;
+  };
+
+  // ===== DATE FORMATTING HELPER =====
+  const formatDueDate = (dateString) => {
+    if (!dateString) return 'No due date';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return dateString; // Return original if parsing fails
+    }
   };
 
   // Load YT API once
@@ -1839,10 +1864,10 @@ const TrainingDashboard = () => {
                     </div>
                   </div>
 
-                  <div className="training-meta">
-                    <span className="type-badge">{training.type}</span>
-                    <span className="due-date">Due: {training.dueDate}</span>
-                  </div>
+                                     <div className="training-meta">
+                     <span className="type-badge">{training.type}</span>
+                     <span className="due-date">Due: {formatDueDate(training.dueDate)}</span>
+                   </div>
                 </div>
               ))}
             </div>
