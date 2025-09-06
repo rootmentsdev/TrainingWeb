@@ -1710,6 +1710,7 @@ const TrainingDashboard = () => {
       }
     }
     if (empID) {
+      console.log('🔄 Loading trainings for empID:', empID);
       loadUserTrainings(empID);
     } else {
       setError('No employee ID found. Please log in again.');
