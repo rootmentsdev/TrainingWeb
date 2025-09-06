@@ -122,16 +122,23 @@ export const apiCall = async (endpoint, options = {}) => {
         if (!response.ok) {
             // If local backend fails, try production backend as fallback
             if (isDevelopment && url.includes('localhost:7000')) {
-                console.log('⚠️ Local backend failed, trying production backend...');
+                console.log('⚠️ Local backend failed (404/500), trying production backend...');
                 const fallbackUrl = `${API_CONFIG.baseUrl}${endpoint}`;
-                const fallbackResponse = await fetch(fallbackUrl, defaultOptions);
+                console.log(`🔄 Fallback URL: ${fallbackUrl}`);
                 
-                if (!fallbackResponse.ok) {
-                    throw new Error(`HTTP error! status: ${fallbackResponse.status}`);
+                try {
+                    const fallbackResponse = await fetch(fallbackUrl, defaultOptions);
+                    
+                    if (!fallbackResponse.ok) {
+                        throw new Error(`Production backend also failed: ${fallbackResponse.status}`);
+                    }
+                    
+                    console.log('✅ Production backend fallback successful');
+                    return await fallbackResponse.json();
+                } catch (fallbackError) {
+                    console.error('❌ Both local and production backends failed:', fallbackError.message);
+                    throw new Error(`Backend unavailable: Local (${response.status}) and Production failed`);
                 }
-                
-                console.log('✅ Production backend fallback successful');
-                return await fallbackResponse.json();
             } else {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -141,30 +148,17 @@ export const apiCall = async (endpoint, options = {}) => {
     } catch (error) {
         console.error('API call failed:', error);
         
-        // If local backend failed or CORS blocked, try production with CORS proxy
-        if ((url.includes('localhost:7000') || error.message.includes('CORS')) && !url.includes(API_CONFIG.corsProxy)) {
-            console.log('🔄 Trying production backend with CORS proxy...');
-            try {
-                const corsProxyUrl = `${API_CONFIG.corsProxy}${API_CONFIG.baseUrl}${endpoint}`;
-                const corsProxyOptions = {
-                    ...defaultOptions,
-                    headers: {
-                        ...defaultOptions.headers,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                };
-                const corsResponse = await fetch(corsProxyUrl, corsProxyOptions);
-                
-                if (!corsResponse.ok) {
-                    throw new Error(`CORS proxy failed: ${corsResponse.status}`);
-                }
-                
-                console.log('✅ CORS proxy successful');
-                return await corsResponse.json();
-            } catch (corsError) {
-                console.error('CORS proxy also failed:', corsError);
-                throw error; // Throw original error
+        // Provide helpful error messages based on error type
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            if (url.includes('localhost:7000')) {
+                throw new Error('Backend server is not running. Please start your backend server on port 7000.');
+            } else {
+                throw new Error('Network error: Unable to connect to backend server.');
             }
+        }
+        
+        if (error.message.includes('404')) {
+            throw new Error(`API endpoint not found: ${endpoint}. Please check if the backend server is running and the endpoint exists.`);
         }
         
         throw error;

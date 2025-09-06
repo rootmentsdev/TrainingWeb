@@ -29,7 +29,8 @@ export const getExternalApiConfig = () => ({
 
 // CORS configuration
 export const getCorsConfig = () => ({
-    corsProxy: isDevelopment ? "https://cors-anywhere.herokuapp.com/" : null,
+    // Disable CORS proxy as it's unreliable and deprecated
+    corsProxy: null,
     forceLocalBackend: isDevelopment
 });
 
