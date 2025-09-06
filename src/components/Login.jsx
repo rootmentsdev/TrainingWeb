@@ -87,6 +87,41 @@ const Login = ({ onLoginSuccess }) => {
                     hasMongoId: employeeData.hasMongoId
                 });
                 
+                // Track LMS website login - Direct fetch call without authentication
+                try {
+                    const trackingData = {
+                        userId: employeeData._id || employeeData.employeeId,
+                        username: employeeData.name,
+                        email: `${employeeData.employeeId}@company.com`,
+                        loginSource: 'LMS_WEBSITE',
+                        timestamp: new Date().toISOString(),
+                        userAgent: navigator.userAgent
+                    };
+                    
+                    console.log('📊 Tracking LMS website login:', trackingData);
+                    
+                    // Direct fetch call to the correct LMS tracking endpoint with JWT token
+                    const response = await fetch('http://localhost:7000/api/lms-login/track', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2JjMDJlNjg2Mzk2ZGNhNWNkNmIwNjQiLCJ1c2VybmFtZSI6IlJldmF0aHkiLCJyb2xlIjoic3VwZXJfYWRtaW4iLCJpYXQiOjE3NTcxNDg2MTR9.fXRyxFUXuTBF2loHFTusGDExS3Du8t_ZUFXa55fiG2w'
+                        },
+                        body: JSON.stringify(trackingData)
+                    });
+                    
+                    if (response.ok) {
+                        console.log('✅ LMS login tracking successful');
+                    } else {
+                        console.log('❌ Tracking failed:', response.status, response.statusText);
+                        const errorText = await response.text();
+                        console.log('❌ Error details:', errorText);
+                    }
+                } catch (trackingError) {
+                    console.warn('⚠️ LMS login tracking failed (non-blocking):', trackingError.message);
+                    // Don't block login if tracking fails
+                }
+                
                 // Call the success callback
                 onLoginSuccess(employeeData);
             } else {

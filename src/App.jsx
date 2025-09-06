@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Login from './components/Login'
 import TrainingDashboard from './components/TrainingDashboard'
+import { lmswebAPI } from './api/api.js'
 import './App.css'
 
 function App() {
@@ -30,7 +31,26 @@ function App() {
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Track logout if user data is available
+    if (user) {
+      try {
+        const logoutData = {
+          userId: user._id || user.employeeId,
+          username: user.name,
+          logoutSource: 'LMS_WEBSITE',
+          timestamp: new Date().toISOString()
+        };
+        
+        console.log('📊 Tracking LMS website logout:', logoutData);
+        await lmswebAPI.trackLogout(logoutData);
+        console.log('✅ LMS logout tracking successful');
+      } catch (trackingError) {
+        console.warn('⚠️ LMS logout tracking failed (non-blocking):', trackingError.message);
+        // Don't block logout if tracking fails
+      }
+    }
+    
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
     setUser(null);

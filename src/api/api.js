@@ -83,7 +83,10 @@ const API_CONFIG = {
         getUserLoginHistory: "api/user-login/user-history",
         getActiveUsers: "api/user-login/active-users",
         getDashboardStats: "api/user-login/dashboard-stats",
-        getPublicStats: "api/user-login/public-stats"
+        getPublicStats: "api/user-login/public-stats",
+        
+        // LMS Website login tracking - use correct endpoint
+        trackLmsLogin: "api/lms-login/track"
     }
 };
 
@@ -592,6 +595,13 @@ export const lmswebAPI = {
     
     // Get public stats
     getPublicStats: () => apiCall(API_CONFIG.endpoints.getPublicStats),
+    
+    // ===== LMS WEBSITE LOGIN TRACKING =====
+    // Track LMS website login
+    trackLmsLogin: (loginData) => apiCall(API_CONFIG.endpoints.trackLmsLogin, {
+        method: 'POST',
+        body: JSON.stringify(loginData)
+    }),
     
     // ===== TRAINING PROCESS DETAILS =====
     // Get detailed training process with modules and videos
