@@ -510,6 +510,8 @@
   justify-content: space-between;
   gap: 16px;
   border-radius: 0 0 18px 18px;
+  min-height: 60px;
+  flex-shrink: 0;
 }
 
 .assessment-notice {
@@ -609,14 +611,14 @@
   .dashboard-header h1{ font-size: 22px; }
   .trainings-grid{ grid-template-columns: 1fr; gap: 14px; }
   .tab-navigation{ flex-direction: column; }
-  .modal-content,.video-content{ margin: 10px; max-height: 75vh; max-width: 95vw; }
+  .modal-content,.video-content{ margin: 10px; max-height: 85vh; max-width: 95vw; }
   .modal-header,.video-header{ padding: 12px 14px; }
   .modal-body,.video-actions{ padding: 12px; }
   .training-meta{ flex-direction: column; gap: 8px; align-items: flex-start; }
   .training-header{ flex-direction: column; align-items: flex-start; gap: 8px; }
   .video-item{ flex-direction: column; align-items: flex-start; gap: 10px; }
   .video-actions{ width: 100%; justify-content: flex-start; }
-  .video-player{ padding-bottom: 40%; }
+  .video-player{ padding-bottom: 60%; }
 }
 
 @media (max-width: 480px){
@@ -624,4 +626,8 @@
   .dashboard-content{ padding: 18px; }
   .training-card{ padding: 16px; }
   .modal-header h2,.video-header h3{ font-size: 16px; }
+  .video-content{ max-height: 90vh; }
+  .video-player{ padding-bottom: 65%; }
+  .video-actions{ padding: 8px 12px; }
+  .video-header{ padding: 10px 12px; }
 }
