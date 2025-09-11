@@ -101,7 +101,7 @@ const Login = ({ onLoginSuccess }) => {
                     console.log('📊 Tracking LMS website login:', trackingData);
                     
                     // Direct fetch call to the correct LMS tracking endpoint with JWT token
-                    const response = await fetch('http://localhost:7000/api/lms-login/track', {
+                    const response = await fetch('https://lms-testenv.onrender.com/api/lms-login/track', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
