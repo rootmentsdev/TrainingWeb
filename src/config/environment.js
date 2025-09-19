@@ -14,7 +14,7 @@ export const getBackendUrl = () => {
     
     // Production URL (Render deployment)
     if (isProduction) {
-        return "https://lms-testenv.onrender.com/"; // ✅ Your actual Render URL
+        return "https://lms-1-lavs.onrender.com/"; // ✅ Your actual Render URL
     }
     
     // Development URL
