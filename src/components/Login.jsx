@@ -129,7 +129,12 @@ const Login = ({ onLoginSuccess }) => {
             }
         } catch (err) {
             console.error('Login error:', err);
-            setError(err.message || 'Login failed. Please try again.');
+            // Check if it's a 401 error (unauthorized) and show user-friendly message
+            if (err.message && err.message.includes('401')) {
+                setError('Please enter correct email id and password');
+            } else {
+                setError(err.message || 'Login failed. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -183,9 +188,6 @@ const Login = ({ onLoginSuccess }) => {
                     </button>
                 </form>
 
-                <div className="demo-credentials">
-                    <p>Demo Account: <strong>EMP103</strong> / <strong>userpassword</strong></p>
-                </div>
             </div>
         </div>
     );
