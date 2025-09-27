@@ -1379,6 +1379,10 @@ const TrainingDashboard = () => {
   // ===== CHECKS =====
   const canWatchVideo = (video, module) => {
     if (!module || !module.videos) return true;
+    
+    // Allow rewatching completed videos
+    if (video.completed) return true;
+    
     const videoIndex = module.videos.findIndex((v) => v._id === video._id);
     if (videoIndex === 0) return true;
     const previousVideo = module.videos[videoIndex - 1];
@@ -1898,7 +1902,18 @@ const TrainingDashboard = () => {
                                 </div>
                                 <div className="video-actions">
                                   {video.completed ? (
-                                    <span className="completed-badge">Completed</span>
+                                    <div className="completed-actions">
+                                      <span className="completed-badge">Completed</span>
+                                      <button
+                                        className="rewatch-button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          watchVideo(video);
+                                        }}
+                                      >
+                                        Rewatch Video
+                                      </button>
+                                    </div>
                                   ) : canWatchVideo(video, module) ? (
                                     <button
                                       className="watch-button"
@@ -1967,7 +1982,7 @@ const TrainingDashboard = () => {
               )}
             </div>
 
-            {videoDuration > 0 && !isVideoWatched && (
+            {videoDuration > 0 && !isVideoWatched && !currentVideo.completed && (
               <div className="watch-requirement">
                 ⚠️ You must watch at least 95% of the video to mark it as complete
               </div>
@@ -1980,10 +1995,23 @@ const TrainingDashboard = () => {
                 );
                 const canComplete = canMarkVideoComplete(currentVideo, currentModule);
                 const canMarkComplete = canComplete && isVideoWatched;
+                const isRewatchMode = currentVideo.completed;
 
                 return (
                   <>
-                    {canComplete ? (
+                    {isRewatchMode ? (
+                      <>
+                        <div className="rewatch-notice">
+                          <p>🔄 You are rewatching this completed video. No further action required.</p>
+                        </div>
+                        <button
+                          className="complete-button"
+                          onClick={() => setShowVideoModal(false)}
+                        >
+                          Close
+                        </button>
+                      </>
+                    ) : canComplete ? (
                       <>
                         <button
                           className={`complete-button ${!canMarkComplete ? 'disabled' : ''}`}
