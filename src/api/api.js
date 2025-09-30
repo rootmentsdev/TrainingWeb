@@ -86,7 +86,10 @@ const API_CONFIG = {
         getPublicStats: "api/user-login/public-stats",
         
         // LMS Website login tracking - use correct endpoint
-        trackLmsLogin: "api/lms-login/track"
+        trackLmsLogin: "api/lms-login/track",
+        
+        // Google Form public API for assessments
+        googleFormPublic: "api/google-form/public"
     }
 };
 
@@ -628,7 +631,11 @@ export const lmswebAPI = {
     // Get user by employee ID
     getUserByEmployeeId: (empId) => apiCall(
         `${API_CONFIG.endpoints.getUserByEmployeeId}?empID=${empId}`
-    )
+    ),
+    
+    // ===== GOOGLE FORM ASSESSMENTS =====
+    // Get public Google Form assessment link
+    getGoogleFormAssessment: () => apiCall(API_CONFIG.endpoints.googleFormPublic)
 };
 
 export default API_CONFIG;
