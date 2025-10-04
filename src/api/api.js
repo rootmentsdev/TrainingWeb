@@ -86,7 +86,10 @@ const API_CONFIG = {
         getPublicStats: "api/user-login/public-stats",
         
         // LMS Website login tracking - use correct endpoint
-        trackLmsLogin: "api/lms-login/track"
+        trackLmsLogin: "api/lms-login/track",
+        
+        // Google Form public API for assessments
+        googleFormPublic: "api/google-form/public"
     }
 };
 
@@ -118,9 +121,17 @@ export const apiCall = async (endpoint, options = {}) => {
         ...options
     };
 
+    // Add timeout handling
+    const timeout = options.timeout || 15000; // 15 seconds default timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
     try {
         console.log(`🌐 Making API call to: ${url}`);
-        const response = await fetch(url, defaultOptions);
+        const response = await fetch(url, {
+            ...defaultOptions,
+            signal: controller.signal
+        });
         
         if (!response.ok) {
             // If local backend fails, try production backend as fallback
@@ -140,9 +151,16 @@ export const apiCall = async (endpoint, options = {}) => {
             }
         }
         
+        clearTimeout(timeoutId);
         return await response.json();
     } catch (error) {
+        clearTimeout(timeoutId);
         console.error('API call failed:', error);
+        
+        // Handle timeout errors specifically
+        if (error.name === 'AbortError') {
+            throw new Error(`Request timeout after ${timeout}ms`);
+        }
         
         // If local backend failed or CORS blocked, try production with CORS proxy
         if ((url.includes('localhost:7000') || error.message.includes('CORS')) && !url.includes(API_CONFIG.corsProxy)) {
@@ -613,7 +631,11 @@ export const lmswebAPI = {
     // Get user by employee ID
     getUserByEmployeeId: (empId) => apiCall(
         `${API_CONFIG.endpoints.getUserByEmployeeId}?empID=${empId}`
-    )
+    ),
+    
+    // ===== GOOGLE FORM ASSESSMENTS =====
+    // Get public Google Form assessment link
+    getGoogleFormAssessment: () => apiCall(API_CONFIG.endpoints.googleFormPublic)
 };
 
 export default API_CONFIG;

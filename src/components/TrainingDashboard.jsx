@@ -1198,6 +1198,36 @@ const TrainingDashboard = () => {
   const [overallCompletion, setOverallCompletion] = useState(0);
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
   const [assessmentPassed, setAssessmentPassed] = useState(false);
+  const [assessments, setAssessments] = useState([]);
+
+  // ===== LOAD ASSESSMENTS =====
+  const loadAssessments = async (empID) => {
+    try {
+      console.log('📋 Loading Google Form assessment...');
+      const response = await lmswebAPI.getGoogleFormAssessment();
+      
+      if (response && response.success && response.data) {
+        console.log('✅ Google Form assessment loaded:', response.data);
+        // Convert the single Google Form response to an array format for consistency
+        const assessmentData = [{
+          _id: 'google-form-assessment',
+          title: response.data.title,
+          description: response.data.description,
+          link: response.data.url,
+          type: 'Google Form',
+          duration: 'Not specified',
+          questions: 'Multiple choice questions'
+        }];
+        setAssessments(assessmentData);
+      } else {
+        console.log('📋 No Google Form assessment available:', response?.message || 'No active form');
+        setAssessments([]);
+      }
+    } catch (error) {
+      console.error('❌ Error loading Google Form assessment:', error);
+      setAssessments([]);
+    }
+  };
 
   // ===== UNIFIED TRAINING LOADING =====
   const loadUserTrainings = async (empID) => {
@@ -1379,6 +1409,10 @@ const TrainingDashboard = () => {
   // ===== CHECKS =====
   const canWatchVideo = (video, module) => {
     if (!module || !module.videos) return true;
+    
+    // Allow rewatching completed videos
+    if (video.completed) return true;
+    
     const videoIndex = module.videos.findIndex((v) => v._id === video._id);
     if (videoIndex === 0) return true;
     const previousVideo = module.videos[videoIndex - 1];
@@ -1711,6 +1745,7 @@ const TrainingDashboard = () => {
     }
     if (empID) {
       loadUserTrainings(empID);
+      loadAssessments(empID);
     } else {
       setError('No employee ID found. Please log in again.');
       setLoading(false);
@@ -1788,66 +1823,128 @@ const TrainingDashboard = () => {
         >
           Mandatory Trainings ({mandatoryTrainings.length})
         </button>
+        <button
+          className={`tab-button ${activeTab === 'assessments' ? 'active' : ''}`}
+          onClick={() => switchTab('assessments')}
+        >
+          Assessments ({assessments.length})
+        </button>
       </div>
 
       {/* ===== CONTENT ===== */}
       <div className="dashboard-content">
-        <div className="trainings-section">
-          <h2>{activeTab === 'assigned' ? 'Assigned Trainings' : 'Mandatory Trainings'}</h2>
+        {activeTab === 'assessments' ? (
+          <div className="assessments-section">
+            <h2>Assessments</h2>
+            
+            {assessments.length === 0 ? (
+              <div className="no-assessments">
+                <h3>No assessments available</h3>
+                <p>No Google Form assessment is currently active. Check back later or contact your administrator.</p>
+              </div>
+            ) : (
+              <div className="assessments-grid">
+                {assessments.map((assessment) => (
+                  <div key={assessment._id || assessment.id} className="assessment-card">
+                    <div className="assessment-header">
+                      <h3>{assessment.title || assessment.name}</h3>
+                      <span className="assessment-type-badge">
+                        {assessment.type || 'Assessment'}
+                      </span>
+                    </div>
+                    
+                    <div className="assessment-description">
+                      <p>{assessment.description || 'Complete this assessment to test your knowledge.'}</p>
+                    </div>
+                    
+                    <div className="assessment-meta">
+                      <span className="assessment-duration">
+                        Duration: {assessment.duration || 'Not specified'}
+                      </span>
+                      <span className="assessment-questions">
+                        Questions: {typeof assessment.questions === 'number' ? assessment.questions : (assessment.questions || 'Not specified')}
+                      </span>
+                    </div>
+                    
+                    <div className="assessment-actions">
+                      {assessment.link ? (
+                        <a
+                          href={assessment.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="assessment-link-button"
+                        >
+                          Start Assessment
+                        </a>
+                      ) : (
+                        <button className="assessment-link-button disabled" disabled>
+                          Link Not Available
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="trainings-section">
+            <h2>{activeTab === 'assigned' ? 'Assigned Trainings' : 'Mandatory Trainings'}</h2>
 
-          {currentTrainings.length === 0 ? (
-            <div className="no-trainings">
-              <h3>No {activeTab} trainings found</h3>
-              <p>Check back later for new trainings or contact your administrator.</p>
-            </div>
-          ) : (
-            <div className="trainings-grid">
-              {currentTrainings.map((training) => (
-                <div
-                  key={training.trainingId}
-                  className="training-card"
-                  onClick={() => openTrainingDetails(training)}
-                >
-                  <div className="training-header">
-                    <h3>{training.name}</h3>
-                    <span
-                      className={`status-badge ${
-                        training.completionPercentage === '100.00'
-                          ? 'completed'
+            {currentTrainings.length === 0 ? (
+              <div className="no-trainings">
+                <h3>No {activeTab} trainings found</h3>
+                <p>Check back later for new trainings or contact your administrator.</p>
+              </div>
+            ) : (
+              <div className="trainings-grid">
+                {currentTrainings.map((training) => (
+                  <div
+                    key={training.trainingId}
+                    className="training-card"
+                    onClick={() => openTrainingDetails(training)}
+                  >
+                    <div className="training-header">
+                      <h3>{training.name}</h3>
+                      <span
+                        className={`status-badge ${
+                          training.completionPercentage === '100.00'
+                            ? 'completed'
+                            : training.completionPercentage > '0.00'
+                            ? 'in-progress'
+                            : 'not-started'
+                        }`}
+                      >
+                        {training.completionPercentage === '100.00'
+                          ? 'COMPLETED'
                           : training.completionPercentage > '0.00'
-                          ? 'in-progress'
-                          : 'not-started'
-                      }`}
-                    >
-                      {training.completionPercentage === '100.00'
-                        ? 'COMPLETED'
-                        : training.completionPercentage > '0.00'
-                        ? 'IN PROGRESS'
-                        : 'NOT STARTED'}
-                    </span>
-                  </div>
-
-                  <div className="training-progress">
-                    <div className="progress-bar">
-                      <div
-                        className="progress-fill"
-                        style={{ width: `${training.completionPercentage}%` }}
-                      ></div>
+                          ? 'IN PROGRESS'
+                          : 'NOT STARTED'}
+                      </span>
                     </div>
-                    <div className="progress-text">
-                      {training.completionPercentage}% Complete
+
+                    <div className="training-progress">
+                      <div className="progress-bar">
+                        <div
+                          className="progress-fill"
+                          style={{ width: `${training.completionPercentage}%` }}
+                        ></div>
+                      </div>
+                      <div className="progress-text">
+                        {training.completionPercentage}% Complete
+                      </div>
+                    </div>
+
+                    <div className="training-meta">
+                      <span className="type-badge">{training.type}</span>
+                      <span className="due-date">Due: {training.dueDate}</span>
                     </div>
                   </div>
-
-                  <div className="training-meta">
-                    <span className="type-badge">{training.type}</span>
-                    <span className="due-date">Due: {training.dueDate}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ===== TRAINING DETAILS MODAL ===== */}
@@ -1898,7 +1995,18 @@ const TrainingDashboard = () => {
                                 </div>
                                 <div className="video-actions">
                                   {video.completed ? (
-                                    <span className="completed-badge">Completed</span>
+                                    <div className="completed-actions">
+                                      <span className="completed-badge">Completed</span>
+                                      <button
+                                        className="rewatch-button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          watchVideo(video);
+                                        }}
+                                      >
+                                        Rewatch Video
+                                      </button>
+                                    </div>
                                   ) : canWatchVideo(video, module) ? (
                                     <button
                                       className="watch-button"
@@ -1967,7 +2075,7 @@ const TrainingDashboard = () => {
               )}
             </div>
 
-            {videoDuration > 0 && !isVideoWatched && (
+            {videoDuration > 0 && !isVideoWatched && !currentVideo.completed && (
               <div className="watch-requirement">
                 ⚠️ You must watch at least 95% of the video to mark it as complete
               </div>
@@ -1980,10 +2088,23 @@ const TrainingDashboard = () => {
                 );
                 const canComplete = canMarkVideoComplete(currentVideo, currentModule);
                 const canMarkComplete = canComplete && isVideoWatched;
+                const isRewatchMode = currentVideo.completed;
 
                 return (
                   <>
-                    {canComplete ? (
+                    {isRewatchMode ? (
+                      <>
+                        <div className="rewatch-notice">
+                          <p>🔄 You are rewatching this completed video. No further action required.</p>
+                        </div>
+                        <button
+                          className="complete-button"
+                          onClick={() => setShowVideoModal(false)}
+                        >
+                          Close
+                        </button>
+                      </>
+                    ) : canComplete ? (
                       <>
                         <button
                           className={`complete-button ${!canMarkComplete ? 'disabled' : ''}`}

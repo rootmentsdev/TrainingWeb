@@ -262,6 +262,158 @@
 }
 .no-trainings h3 { color: var(--text); margin-bottom: 6px; }
 
+/* ===== ASSESSMENTS SECTION ===== */
+.assessments-section h2 {
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.assessments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+  margin-bottom: 12px;
+}
+
+.assessment-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: all 0.22s ease;
+  position: relative;
+}
+
+.assessment-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-2);
+  transform: translateY(-2px);
+}
+
+.assessment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  gap: 10px;
+}
+
+.assessment-header h3 {
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.assessment-type-badge {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+}
+
+.assessment-description {
+  margin-bottom: 14px;
+}
+
+.assessment-description p {
+  color: var(--muted-2);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.assessment-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--muted-2);
+}
+
+.assessment-duration,
+.assessment-questions {
+  background: #f1f5f9;
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+
+.assessment-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.assessment-link-button {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+}
+
+.assessment-link-button:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+  color: white;
+  text-decoration: none;
+}
+
+.assessment-link-button.disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.assessment-link-button.disabled:hover {
+  background: #cbd5e1;
+  color: #94a3b8;
+  transform: none;
+  box-shadow: none;
+}
+
+.no-assessments {
+  text-align: center;
+  color: var(--muted-2);
+  padding: 48px 24px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: var(--radius-lg);
+}
+
+.no-assessments h3 {
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
 /* ===== MODAL STYLES ===== */
 .training-details-modal,
 .video-modal {
@@ -399,6 +551,13 @@
 
 .video-actions { display: flex; align-items: center; gap: 8px; }
 
+.completed-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .watch-button {
   background: var(--primary);
   color: white; border: none;
@@ -410,6 +569,21 @@
 }
 .watch-button:hover { background: var(--primary-700); transform: translateY(-1px); }
 .watch-button:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; }
+
+.rewatch-button {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white; border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.18s ease;
+  box-shadow: 0 4px 12px rgba(16,185,129,.25);
+}
+.rewatch-button:hover { 
+  background: linear-gradient(135deg, #059669 0%, #047857 100%); 
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16,185,129,.35);
+}
 
 .completed-badge,
 .locked-badge {
@@ -540,6 +714,19 @@
 }
 .locked-notice p { margin: 0; color: var(--danger-700); font-size: 12px; font-weight: 600; }
 
+.rewatch-notice {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0;
+  text-align: left;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.rewatch-notice p { margin: 0; color: #065f46; font-size: 12px; font-weight: 600; }
+
 .complete-button {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white; border: none;
@@ -610,14 +797,18 @@
   .dashboard-header{ flex-direction: column; gap: 12px; text-align: center; padding: 22px; }
   .dashboard-header h1{ font-size: 22px; }
   .trainings-grid{ grid-template-columns: 1fr; gap: 14px; }
+  .assessments-grid{ grid-template-columns: 1fr; gap: 14px; }
   .tab-navigation{ flex-direction: column; }
   .modal-content,.video-content{ margin: 10px; max-height: 85vh; max-width: 95vw; }
   .modal-header,.video-header{ padding: 12px 14px; }
   .modal-body,.video-actions{ padding: 12px; }
   .training-meta{ flex-direction: column; gap: 8px; align-items: flex-start; }
   .training-header{ flex-direction: column; align-items: flex-start; gap: 8px; }
+  .assessment-header{ flex-direction: column; align-items: flex-start; gap: 8px; }
+  .assessment-meta{ flex-direction: column; gap: 8px; align-items: flex-start; }
   .video-item{ flex-direction: column; align-items: flex-start; gap: 10px; }
   .video-actions{ width: 100%; justify-content: flex-start; }
+  .completed-actions{ flex-direction: column; align-items: flex-start; gap: 8px; }
   .video-player{ padding-bottom: 60%; }
 }
 
@@ -625,6 +816,7 @@
   .training-dashboard{ padding: 12px; }
   .dashboard-content{ padding: 18px; }
   .training-card{ padding: 16px; }
+  .assessment-card{ padding: 16px; }
   .modal-header h2,.video-header h3{ font-size: 16px; }
   .video-content{ max-height: 90vh; }
   .video-player{ padding-bottom: 65%; }
